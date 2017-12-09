@@ -69,29 +69,19 @@ def evaluate(solutions, real):
 def sigmoid(inX):
     return 1.0 / (1 + np.exp(-inX))
 
-def step_function(inX):
+def sigmoid_deriv(sigmoid_value):
+    return sigmoid_value * (1 - sigmoid_value)
+
+def sigmoid_binary_classifier(sigmoid_value):
     try:
-        return 1 if inX >= 0 else 0
+        label = 1 if sigmoid_value >= 0.5 else 0
+        return label
     except:
         try:
-            return [1 if inX_ele >= 0 else 0 for inX_ele in inX]
+            labels = [1 if sigmoid_ele_value >= 0.5 else 0 for sigmoid_ele_value in sigmoid_value]
+            return labels
         except:
-            raise Exception()
-
-def step_binary_activation(inX):
-    return step_function(inX)
-
-def sigmoid_binary_activation(inX):
-    sigmoid_inX = sigmoid(inX)
-    try:
-        sigmoid_inX[sigmoid_inX >= 0.5] = 1
-        sigmoid_inX[sigmoid_inX < 0.5] = 0
-    except:
-        try:
-            sigmoid_inX = 1 if sigmoid_inX >= 0.5 else 0
-        except:
-            raise AssertionError
-    return sigmoid_inX
+            raise AssertionError()
 
 def euc_dis(vector1, vector2):
     if len(vector1) != len(vector2):
@@ -127,13 +117,14 @@ class KNN:
         return result_array
 
 class Perceptron:
-    def __init__(self, learning_rate=0.01, activation_fun=sigmoid_binary_activation, epoch=200):
+    def __init__(self, learning_rate=0.01, activation_fun=sigmoid, classifier=sigmoid_binary_classifier, epoch=200):
         # Perceptron state here
         # Feel free to add methods
         self.W = None
         self.b = None
         self.learning_rate = learning_rate
         self.activation_fun = activation_fun
+        self.classifier = classifier
         self.epoch = epoch
     
     def _init_parameters(self, input_shape):
@@ -143,7 +134,8 @@ class Perceptron:
     def _forward_prop(self, current_epoch, features, labels, sample_num):
         correct_classified = 0
         for feature, label in zip(features, labels):
-            label_pred = self.activation_fun(np.dot(self.W, feature) + self.b)
+            y = self.activation_fun(np.dot(self.W, feature) + self.b)
+            label_pred = self.classifier(y)
             if (label == label_pred):
                 correct_classified += 1
 
@@ -163,29 +155,19 @@ class Perceptron:
     def predict(self, features):
         # Run model here
         # Return list/array of predictions where there is one prediction for each set of features
-        return self.activation_fun(np.dot(features, self.W) + self.b)
+        
+        return self.classifier(self.activation_fun(np.dot(features, self.W) + self.b))
 
 # class MLP:
 #     def __init__(self, learning_rate=0.01, activation_fun=sigmoid_binary_activation, hidden_layer_size=5, epoch=200):
 #         # Multilayer perceptron state here
 #         # Feel free to add methods
-#         self.input_W, self.hidden_layer_W = None, None
-#         self.input_b, self.hidden_layer_b = None, None
-#         self.hidden_layer_size = hidden_layer_size
-#         self.learning_rate = learning_rate
-#         self.epoch = epoch
-
-#     def _init_parameters(self, input_shape):
 #         pass
 
 #     def train(self, features, labels):
-        # training logic here
-        # input is list/array of features and labels
-        # _init_parameters(features.shape[1])
-        # sample_num = features.shape[0]
-        # for current_epoch in range(self.epoch):
-        #     _forward_prop()
-        #     _backward_prop()
+#         # training logic here
+#         # input is list/array of features and labels
+#         pass  
 
 #     def predict(self, features):
 #         # Run model here
@@ -228,7 +210,7 @@ def test_knn_model(dataset, k_range=[1,3]):
 
 def test_perceptron_model(dataset):
     X_train, y_train, X_test, y_test = prepare_data(dataset)
-    perceptron_model = Perceptron(learning_rate=0.01, activation_fun=sigmoid_binary_activation)
+    perceptron_model = Perceptron(learning_rate=0.01)
     perceptron_model.train(X_train, y_train)
     print("Perceptron model test accuracy:", evaluate(y_test, perceptron_model.predict(X_test)))
 
