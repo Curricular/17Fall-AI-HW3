@@ -109,8 +109,8 @@ class KNN:
     def train(self, features, labels):
         # training logic here
         # input is list/array of features and labels
-        self.features = features
-        self.labels = labels
+        self.features = features.copy()
+        self.labels = labels.copy()
 
     def predict(self, features, distance_function=euc_dis):
         # Run model here
@@ -135,30 +135,30 @@ class Perceptron:
         self.learning_rate = learning_rate
         self.activation_fun = activation_fun
         self.epoch = epoch
+    
+    def _init_parameters(self, input_shape):
+        self.W = np.random.randn(input_shape)
+        self.b = np.random.randn()
+    
+    def _forward_prop(self, current_epoch, features, labels, sample_num):
+        correct_classified = 0
+        for feature, label in zip(features, labels):
+            label_pred = self.activation_fun(np.dot(self.W, feature) + self.b)
+            if (label == label_pred):
+                correct_classified += 1
+
+            error_value = label - label_pred
+            self.W += self.learning_rate * error_value * feature
+            self.b += self.learning_rate * error_value
+        accuracy = correct_classified / sample_num
+        print(f"epoch {current_epoch}: training accuracy -> {accuracy}")
 
     def train(self, features, labels):
         # training logic here
         # input is list/array of features and labels
-        print("Perceptron training")
-        try:
-            self.W = np.random.randn(features.shape[1])
-            self.b = np.random.randn()
-            sample_num = features.shape[0]
-            for current_epoch in range(self.epoch):
-                correct_classified = 0
-                for feature, label in zip(features, labels):
-                    label_pred = self.activation_fun(np.dot(self.W, feature) + self.b)
-                    if (label == label_pred):
-                        correct_classified += 1
-
-                    error_value = label - label_pred
-                    self.W += self.learning_rate * error_value * feature
-                    self.b += self.learning_rate * error_value
-                accuracy = correct_classified / sample_num
-                print(f"epoch {current_epoch}: training accuracy -> {accuracy}")
-
-        except Exception:
-            raise AssertionError()
+        self._init_parameters(input_shape=features.shape[1])
+        for current_epoch in range(self.epoch):
+            self._forward_prop(current_epoch, features, labels, sample_num=features.shape[0])
 
     def predict(self, features):
         # Run model here
@@ -166,27 +166,31 @@ class Perceptron:
         return self.activation_fun(np.dot(features, self.W) + self.b)
 
 # class MLP:
-#     def __init__(self):
+#     def __init__(self, learning_rate=0.01, activation_fun=sigmoid_binary_activation, hidden_layer_size=5, epoch=200):
 #         # Multilayer perceptron state here
 #         # Feel free to add methods
-#         self.weight = None
-#         self.learningrate = 0.01
-#     pass
-#
-#     def train(self, features, labels):
-#         # training logic here
-#         # input is list/array of features and labels
-#         self.weight = np.random.uniform(-0.2, 0.2, len(features[0]) + 1)
-#
+#         self.input_W, self.hidden_layer_W = None, None
+#         self.input_b, self.hidden_layer_b = None, None
+#         self.hidden_layer_size = hidden_layer_size
+#         self.learning_rate = learning_rate
+#         self.epoch = epoch
+
+#     def _init_parameters(self, input_shape):
 #         pass
-#
+
+#     def train(self, features, labels):
+        # training logic here
+        # input is list/array of features and labels
+        # _init_parameters(features.shape[1])
+        # sample_num = features.shape[0]
+        # for current_epoch in range(self.epoch):
+        #     _forward_prop()
+        #     _backward_prop()
+
 #     def predict(self, features):
 #         # Run model here
 #         # Return list/array of predictions where there is one prediction for each set of features
 #         pass
-#
-#     def sigmoid(self, inX):
-#         return 1.0 / (1 + np.exp(-inX))
 
 # class ID3:
 # 	def __init__(self):
