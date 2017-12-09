@@ -83,8 +83,14 @@ def step_binary_activation(inX):
 
 def sigmoid_binary_activation(inX):
     sigmoid_inX = sigmoid(inX)
-    sigmoid_inX[sigmoid_inX >= 0.5] = 1
-    sigmoid_inX[sigmoid_inX < 0.5] = 0
+    try:
+        sigmoid_inX[sigmoid_inX >= 0.5] = 1
+        sigmoid_inX[sigmoid_inX < 0.5] = 0
+    except:
+        try:
+            sigmoid_inX = 1 if sigmoid_inX >= 0.5 else 0
+        except:
+            raise AssertionError
     return sigmoid_inX
 
 def euc_dis(vector1, vector2):
@@ -136,7 +142,7 @@ class Perceptron:
         print("Perceptron training")
         try:
             self.W = np.random.randn(features.shape[1])
-            self.b = np.random.randn(1)
+            self.b = np.random.randn()
             sample_num = features.shape[0]
             for current_epoch in range(self.epoch):
                 correct_classified = 0
