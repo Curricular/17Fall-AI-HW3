@@ -174,18 +174,66 @@ class Perceptron:
 #         # Return list/array of predictions where there is one prediction for each set of features
 #         pass
 
-# class ID3:
-# 	def __init__(self):
-# 		#Decision tree state here
-# 		#Feel free to add methods
+class DecisionTreeNode():
+    def __init__(self, left_child, right_child, is_leaf, criteria, label):
+        self.left_child = left_child
+        self.right_child = right_child
+        self.is_leaf = is_leaf
+        self.criteria = criteria
+        self.label = label
 
-# 	def train(self, features, labels):
-# 		#training logic here
-# 		#input is list/array of features and labels
+    def decide(self, feature):
+        if self.is_leaf:
+            return self.label
 
-# 	def predict(self, features):
-# 		#Run model here
-# 		#Return list/array of predictions where there is one prediction for each set of features
+        deciison_branch = self.criteria(feature)
+        if decision_branch == 'left':
+            return self.left_child
+        elif deicision_branch == 'right':
+            return self.right_child
+        else:
+            raise AssertionError()
+
+class DecisionTree():
+    def __init__(self, root):
+        self.root = root
+
+    def get_tree(self):
+        return self.root
+
+class ID3:
+	def __init__(self, bucket_size=5):
+		#Decision tree state here
+		#Feel free to add methods
+        self.bucket_size = bucket_size
+        self.tree = None
+    
+    def _create_decision_tree(self, features, labels):
+        root = None
+        positive_sample = 0
+        negative_sample = 0
+        for label in labels:
+            if label == 0:
+                negative_sample += 1
+            else:
+                positive_sample += 1
+        
+        remained_columns = [i for i in range(len(features))】
+        if positive_sample == 0 or negative_sample == 0 or len(remained_columns) == 0:
+            root = DecisionTreeNode(None, None, True, None, label = 1 if positive_sample > negative_sample else 0)
+            self.tree = DecisionTree(root)
+        else:
+            attr, threshold = self.decide_attr(features, labels, remained_columns)
+
+
+	def train(self, features, labels):
+		#training logic here
+		#input is list/array of features and labels
+        _create_decision_tree(features, labels)
+
+	def predict(self, features):
+		#Run model here
+		#Return list/array of predictions where there is one prediction for each set of features
 
 def prepare_data(dataset, training_split_rate = 0.8, one_hot_encoding=True, use_numpy=True):
     numeric_features = ['net_ope_exp', 'net_con', 'tot_loa']
